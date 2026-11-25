@@ -15,7 +15,7 @@ my-folder/
     stockfish-macos-m1-apple-silicon
 ```
 
-Or give the engine's path, with its arguments after `--`:
+Alternatively, you can run it via the command line and point the helper to your engine:
 
 ```bash
 tabiya-remote-engine /opt/homebrew/bin/stockfish
@@ -38,7 +38,7 @@ Without a path, the helper looks in its own folder, and in the folders inside it
 
 | Flag | Default | |
 | --- | --- | --- |
-| `-port` | `9472` | The port on 127.0.0.1. Tabiya expects 9472. |
+| `-port` | `9472` | The port on `127.0.0.1`. Tabiya expects `9472`. |
 | `-origin` | | Another site that may connect, such as a staging site. Repeat the flag for more than one. |
 
 ## How it works
@@ -48,7 +48,7 @@ The helper listens on `127.0.0.1:9472`, so it's reachable from your computer onl
 ### Security
 
 - **Only Tabiya's pages can connect.** Their `Origin` must be `https://tabiya.cloud`, or Tabiya's development servers (`http://localhost:5173` and `:4173`), or a site given with `-origin`.
-- **Only from your computer.** The `Host` must be the loopback address, so a site that points its own name at 127.0.0.1 (DNS rebinding) is refused.
+- **Only from your computer.** The `Host` must be the loopback address, so a site that points its own name at `127.0.0.1` (DNS rebinding) is refused.
 - **Only the engine you chose runs.** A page can't choose a program, a path or the engine's arguments.
 - **Only the commands Tabiya analyses with reach the engine:** `uci`, `isready`, `ucinewgame`, `position`, `go`, `stop` and `ponderhit`. Of the options, only `Threads`, `Hash` and `MultiPV` can be set, and only to numbers. No option that names a file gets through, such as Stockfish's `Debug Log File`, which would let a page write to your disk.
 - **Your positions never leave your computer.** The helper doesn't contact Tabiya's servers or anything else on the internet.
