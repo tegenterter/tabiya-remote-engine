@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -69,6 +70,9 @@ func main() {
 	}
 
 	name, err := eng.probe()
+	if errors.Is(err, errSilent) && runtime.GOOS == "darwin" {
+		fatal("%s didn't start. macOS may have blocked it, as it does a downloaded program it can't check: open System Settings, then Privacy & Security, choose Open Anyway next to %q, then open the helper again.", eng.path, filepath.Base(eng.path))
+	}
 	if err != nil {
 		fatal("%s doesn't answer as a UCI engine: %v", eng.path, err)
 	}
@@ -90,6 +94,8 @@ type engine struct {
 	args []string
 }
 
+var errSilent = errors.New("it wrote nothing")
+
 func (e engine) probe() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -107,8 +113,10 @@ func (e engine) probe() (string, error) {
 		_ = cmd.Wait()
 	}()
 	name := e.path
+	wrote := false
 	sc := bufio.NewScanner(out)
 	for sc.Scan() {
+		wrote = true
 		line := strings.TrimSpace(sc.Text())
 		if n, ok := strings.CutPrefix(line, "id name "); ok {
 			name = n
@@ -116,6 +124,9 @@ func (e engine) probe() (string, error) {
 		if line == "uciok" {
 			return name, nil
 		}
+	}
+	if !wrote {
+		return "", errSilent
 	}
 	if ctx.Err() != nil {
 		return "", errors.New("no uciok within 10 s")
