@@ -218,6 +218,12 @@ func (s *server) run(ctx context.Context, c *websocket.Conn) string {
 	}
 	defer stop()
 
+	// The page sizes its Threads setting from this, since a browser may not
+	// say how many cores the computer has (Brave reports fewer).
+	if err := c.Write(ctx, websocket.MessageText, []byte(hello())); err != nil {
+		return "the page left"
+	}
+
 	ended := make(chan error, 1)
 	go func() {
 		sc := bufio.NewScanner(out)
@@ -259,6 +265,12 @@ func (s *server) run(ctx context.Context, c *websocket.Conn) string {
 			}
 		}
 	}
+}
+
+// hello is the first line a page gets: an "info string", which a UCI front
+// end ignores, with the computer's logical cores.
+func hello() string {
+	return fmt.Sprintf("info string tabiya-remote-engine cores %d", runtime.NumCPU())
 }
 
 var options = map[string]bool{"Threads": true, "Hash": true, "MultiPV": true}
