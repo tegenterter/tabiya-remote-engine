@@ -43,7 +43,7 @@ Without a path, the helper looks in its own folder, and in the folders inside it
 
 ## How it works
 
-The helper listens on `127.0.0.1:9472`, so it's reachable from your computer only. Each Tabiya page that connects opens a WebSocket at `/uci`. The helper then starts the engine for that page and passes UCI lines both ways, one message per line. When the page leaves, it tells the engine to quit, and stops it a second later if it hasn't.
+The helper listens on `127.0.0.1:9472`, so it's reachable from your computer only. Each Tabiya page that connects opens a WebSocket at `/uci`. The helper then starts the engine for that page and passes UCI lines both ways, one message per line. Its first line tells the page how many cores your computer has (`info string tabiya-remote-engine cores 10`, which a UCI front end ignores), so Tabiya can offer a thread for each, even in a browser that hides that number. When the page leaves, it tells the engine to quit, and stops it a second later if it hasn't.
 
 ### Security
 

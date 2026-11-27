@@ -218,6 +218,10 @@ func (s *server) run(ctx context.Context, c *websocket.Conn) string {
 	}
 	defer stop()
 
+	if err := c.Write(ctx, websocket.MessageText, []byte(hello())); err != nil {
+		return "the page left"
+	}
+
 	ended := make(chan error, 1)
 	go func() {
 		sc := bufio.NewScanner(out)
@@ -259,6 +263,10 @@ func (s *server) run(ctx context.Context, c *websocket.Conn) string {
 			}
 		}
 	}
+}
+
+func hello() string {
+	return fmt.Sprintf("info string tabiya-remote-engine cores %d", runtime.NumCPU())
 }
 
 var options = map[string]bool{"Threads": true, "Hash": true, "MultiPV": true}
